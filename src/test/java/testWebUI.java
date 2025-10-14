@@ -2,9 +2,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -20,12 +18,14 @@ public class testWebUI {
     private WebDriver driver;
     private String resulttt;
     private String event;
+    private String competitionType;
 
     private WebElement waitForElement(By locator) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
+    // --------------------------------------------------
     @Given("User navigates to the registration page")
     public void userNavigatesToTheRegistrationPage() {
         String browser = System.getenv("BROWSER") != null ? System.getenv("BROWSER") : "chrome";
@@ -45,41 +45,56 @@ public class testWebUI {
         driver.get(url);
     }
 
+    // --------------------------------------------------
+    @And("Select competition {string}")
+    public void selectCompetition(String competition) {
+        this.competitionType = competition;
+        WebElement modeDropdown = waitForElement(By.xpath("//*[@id=\"mode\"]"));
+        Select select = new Select(modeDropdown);
+        select.selectByVisibleText(competition);
+        System.out.println("Competition selected: " + competition);
+    }
+
+    // --------------------------------------------------
     @Given("Add competitor {string}")
     public void enteredFirstName(String name) {
         By nameFieldLocator = By.id("name");
         WebElement nameField = waitForElement(nameFieldLocator);
+        nameField.clear();
         nameField.sendKeys(name);
     }
 
-    @And("Add copetion")
-    public void addCopetion() {
-        driver.findElement(By.xpath("//*[@id=\"add\"]")).click();
+    @And("Add competition")
+    public void addCompetition() {
+        driver.findElement(By.id("add")).click();
     }
 
     @And("Enter result name {string}")
     public void enterResultName(String arg0) {
-        driver.findElement(By.xpath("//*[@id=\"name2\"]")).sendKeys(arg0);
+        WebElement nameField = waitForElement(By.id("name2"));
+        nameField.clear();
+        nameField.sendKeys(arg0);
     }
 
     @And("Select Event {string}")
     public void selectEvent(String eventName) {
         this.event = eventName;
-        WebElement eventDropdown = driver.findElement(By.id("event"));
+        WebElement eventDropdown = waitForElement(By.id("event"));
         Select select = new Select(eventDropdown);
-        select.selectByVisibleText(eventName); // يختار الحدث حسب النص الظاهر
+        select.selectByVisibleText(eventName);
     }
 
-    // -----------------------------------
     @And("Enter raw score {string}")
     public void enterRawScore(String arg1) {
         resulttt = arg1;
-        driver.findElement(By.xpath("//*[@id=\"raw\"]")).sendKeys(arg1);
+        WebElement rawInput = waitForElement(By.id("raw"));
+        rawInput.clear();
+        rawInput.sendKeys(arg1);
     }
 
     @Then("Save Score")
     public void saveScore() {
-        driver.findElement(By.xpath("//*[@id=\"save\"]")).click();
+        driver.findElement(By.id("save")).click();
     }
 
     @Then("Score rank")
@@ -87,6 +102,7 @@ public class testWebUI {
         System.out.println("Recorded score for event " + event + " = " + resulttt);
     }
 
+    // --------------------------------------------------
     @Then("Use Score rank in calculation")
     public void useScoreRankInCalculation() {
         double P = Double.parseDouble(resulttt);
@@ -94,7 +110,7 @@ public class testWebUI {
         Map<String, double[]> eventParams = new HashMap<>();
         Map<String, String> eventType = new HashMap<>();
 
-        // Decathlon events
+        // ------------------- Decathlon -------------------
         eventParams.put("100m (s)", new double[]{25.4347, 18, 1.81});
         eventType.put("100m (s)", "track");
 
@@ -104,30 +120,30 @@ public class testWebUI {
         eventParams.put("Shot Put (m)", new double[]{51.39, 1.5, 1.05});
         eventType.put("Shot Put (m)", "field");
 
+        eventParams.put("High Jump (cm)", new double[]{0.8465, 75, 1.42});
+        eventType.put("High Jump (cm)", "field");
+
         eventParams.put("400m (s)", new double[]{1.53775, 82, 1.81});
         eventType.put("400m (s)", "track");
-
-        eventParams.put("1500m (s)", new double[]{0.03768, 480, 1.85});
-        eventType.put("1500m (s)", "track");
 
         eventParams.put("110m Hurdles (s)", new double[]{5.74352, 28.5, 1.92});
         eventType.put("110m Hurdles (s)", "track");
 
-        eventParams.put("High Jump (cm)", new double[]{0.8465, 75, 1.42});
-        eventType.put("High Jump (cm)", "field");
+        eventParams.put("Discus (m)", new double[]{12.91, 4, 1.1});
+        eventType.put("Discus (m)", "field");
 
         eventParams.put("Pole Vault (cm)", new double[]{0.2797, 100, 1.35});
         eventType.put("Pole Vault (cm)", "field");
 
-        eventParams.put("Discus Throw (m)", new double[]{12.91, 4, 1.1});
-        eventType.put("Discus Throw (m)", "field");
+        eventParams.put("Javelin (m)", new double[]{10.14, 7, 1.08});
+        eventType.put("Javelin (m)", "field");
 
-        eventParams.put("Javelin Throw (m)", new double[]{10.14, 7, 1.08});
-        eventType.put("Javelin Throw (m)", "field");
+        eventParams.put("1500m (s)", new double[]{0.03768, 480, 1.85});
+        eventType.put("1500m (s)", "track");
 
-        // Heptathlon events
-        eventParams.put("hep100mHurdles (s)", new double[]{9.23076, 26.7, 1.835});
-        eventType.put("hep100mHurdles (s)", "track");
+        // ------------------- Heptathlon -------------------
+        eventParams.put("100m Hurdles (s)", new double[]{9.23076, 26.7, 1.835});
+        eventType.put("100m Hurdles (s)", "track");
 
         eventParams.put("200m (s)", new double[]{4.99087, 42.5, 1.81});
         eventType.put("200m (s)", "track");
@@ -135,19 +151,19 @@ public class testWebUI {
         eventParams.put("800m (s)", new double[]{0.11193, 254, 1.88});
         eventType.put("800m (s)", "track");
 
-        eventParams.put("hepHighJump (cm)", new double[]{1.84523, 75, 1.348});
-        eventType.put("hepHighJump (cm)", "field");
+        eventParams.put("High Jump (cm)", new double[]{1.84523, 75, 1.348});
+        eventType.put("High Jump (cm)", "field");
 
-        eventParams.put("hepJavelinThrow (m)", new double[]{15.9803, 3.8, 1.04});
-        eventType.put("hepJavelinThrow (m)", "field");
+        eventParams.put("Javelin (m)", new double[]{15.9803, 3.8, 1.04});
+        eventType.put("Javelin (m)", "field");
 
-        eventParams.put("hepLongJump (cm)", new double[]{0.188807, 210, 1.41});
-        eventType.put("hepLongJump (cm)", "field");
+        eventParams.put("Long Jump (cm)", new double[]{0.188807, 210, 1.41});
+        eventType.put("Long Jump (cm)", "field");
 
-        eventParams.put("hepShotPut (m)", new double[]{56.0211, 1.5, 1.05});
-        eventType.put("hepShotPut (m)", "field");
+        eventParams.put("Shot Put (m)", new double[]{56.0211, 1.5, 1.05});
+        eventType.put("Shot Put (m)", "field");
 
-        // ----------------
+        // --------------------------------------------------
         double[] params = eventParams.get(event);
         if (params == null) {
             System.out.println("Event not found: " + event);
@@ -161,12 +177,11 @@ public class testWebUI {
         double points;
         if (eventType.get(event).equals("track")) {
             points = A * Math.pow(B - P, C);
-        } else { // field
+        } else {
             points = A * Math.pow(P - B, C);
         }
 
         int finalPoints = (int) points;
-        System.out.println("Event: " + event + " | Performance: " + P + " | Points: " + finalPoints);
+        System.out.println("Competition: " + competitionType + " | Event: " + event + " | Performance: " + P + " | Points: " + finalPoints);
     }
 }
-
