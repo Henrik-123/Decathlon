@@ -1,4 +1,5 @@
 import com.example.decathlon.deca.Deca1500M;
+import com.example.decathlon.heptathlon.Hep100MHurdles;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,5 +50,50 @@ public class ScoringServiceBvaTest {
         double expected = 1268;
 
         assertEquals(expected,actual);
+    }
+    @Test
+    public void testLowBoundry100mHurdles(){
+        Hep100MHurdles input = new Hep100MHurdles();
+
+        double actual = input.calculateResult((10));
+        double expected = 1617;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundry100mHurdles(){
+        Hep100MHurdles input = new Hep100MHurdles();
+
+        double actual = input.calculateResult((10.01));
+        double expected = 1616;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundry100mHurdles(){
+        Hep100MHurdles input = new Hep100MHurdles();
+
+        double actual = input.calculateResult((30));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundry100mHurdles(){
+        Hep100MHurdles input = new Hep100MHurdles();
+
+        double actual = input.calculateResult((29.99));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testCalculation100mHurdles(){
+        Hep100MHurdles input = new Hep100MHurdles();
+
+        double actual = input.calculateResult((20));
+        double expected = 302;
+
+        assertEquals(expected, actual);
     }
 }
