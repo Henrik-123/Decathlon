@@ -1,10 +1,11 @@
 import com.example.decathlon.deca.Deca1500M;
 import com.example.decathlon.heptathlon.Hep100MHurdles;
+import com.example.decathlon.heptathlon.Hep200M;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ScoringServiceBvaTest {
+public class  ScoringServiceBvaTest {
 
     @Test
     public void testLowBoundary1500M(){
@@ -95,5 +96,44 @@ public class ScoringServiceBvaTest {
         double expected = 302;
 
         assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundary200m(){
+        Hep200M input = new Hep200M();
+
+        double actual = input.calculateResult(20);
+        double expected = 1398;
+
+        assertEquals(expected,actual);
+    }
+
+    @Test
+    public void testAboveLowBoundary200m(){
+        Hep200M input = new Hep200M();
+
+        double actual = input.calculateResult(20.01);
+        double expected = 1397;
+
+        assertEquals(expected,actual);
+    }
+
+    @Test
+    public void testHighBoundary200m(){
+        Hep200M input = new Hep200M();
+
+        double actual = input.calculateResult(100.0);
+        double expected = 0;
+
+        assertEquals(expected,actual);
+    }
+
+    @Test
+    public void testUnderHighBoundary200m(){
+        Hep200M input = new Hep200M();
+
+        double actual = input.calculateResult(99.99);
+        double expected = 0;
+
+        assertEquals(expected,actual);
     }
 }
