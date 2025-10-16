@@ -1,3 +1,9 @@
+/**
+* Cucumber Feature: Registration and Scoring
+*
+* This feature automates the registration and scoring process for Decathlon and Heptathlon events.
+**/
+
 Feature: Registration and scoring
   Scenario: Register user in 1500m event
     Given User navigates to the registration page
