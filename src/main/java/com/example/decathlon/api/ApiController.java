@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
-
 @RestController
-@RequestMapping("/api")
-
+@RequestMapping("/com/example/decathlon/api")
 public class ApiController {
     private final CompetitionService comp;
 
