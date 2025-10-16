@@ -1,4 +1,6 @@
 package com.example.decathlon.gui;
+/* Fix selection issue between Decathlon and Heptathlon
+ */
 
 import javax.swing.*;
 import java.awt.*;
