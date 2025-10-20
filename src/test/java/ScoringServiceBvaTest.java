@@ -2,6 +2,8 @@ import com.example.decathlon.deca.Deca1500M;
 import com.example.decathlon.deca.DecaHighJump;
 import com.example.decathlon.heptathlon.Hep100MHurdles;
 import com.example.decathlon.heptathlon.Hep200M;
+import com.example.decathlon.heptathlon.HeptJavelinThrow;
+import com.example.decathlon.heptathlon.HeptLongJump;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -137,7 +139,99 @@ public class  ScoringServiceBvaTest {
 
         assertEquals(expected,actual);
     }
+    // Long jump (Heptathlon)
     @Test
+    public void calculationLongJump(){
+        HeptLongJump input = new HeptLongJump();
+
+        double actual = input.calculateResult((500));
+        double expected = 559;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundryLongJump(){
+        HeptLongJump input = new HeptLongJump();
+
+        double actual = input.calculateResult(0);
+        double expected = 0;
+
+        assertEquals(expected,actual);
+    }
+    @Test
+    public void testAboveLowBoundryLongJump(){
+        HeptLongJump input = new HeptLongJump();
+
+        double actual = input.calculateResult(0.01);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundryLongJump(){
+        HeptLongJump input = new HeptLongJump();
+
+        double actual = input.calculateResult(1000.00);
+        double expected = 2299;
+
+        assertEquals(expected,actual);
+    }
+    @Test
+    public void testBellowHighBoundryLongJump(){
+        HeptLongJump input = new HeptLongJump();
+
+        double actual = input.calculateResult(999.99);
+        double expected = 2299;
+
+        assertEquals(expected,actual);
+    }
+    // Javelin throw (heptathlon)
+    @Test
+    public void calculateJavelinThrow(){
+        HeptJavelinThrow input = new HeptJavelinThrow();
+
+        double actual = input.calculateResult(50);
+        double expected = 860;
+
+        assertEquals(expected,actual);
+    }
+    @Test
+    public void testLowBoundryJavelinThrow(){
+        HeptJavelinThrow input = new HeptJavelinThrow();
+
+        double actual = input.calculateResult(0);
+        double expected = 0;
+
+        assertEquals(expected,actual);
+    }
+    @Test
+    public void testAboveLowBoundryJavelinThrow(){
+        HeptJavelinThrow input = new HeptJavelinThrow();
+
+        double actual = input.calculateResult(0.01);
+        double expected = 0;
+
+        assertEquals(expected,actual);
+    }
+    @Test
+    public void testHighBoundryJavelinThrow(){
+        HeptJavelinThrow input = new HeptJavelinThrow();
+
+        double actual = input.calculateResult(110);
+        double expected = 2045;
+
+        assertEquals(expected,actual);
+    }
+    @Test
+    public void testBellowHighBoundryJavelinThrow(){
+        HeptJavelinThrow input = new HeptJavelinThrow();
+
+        double actual = input.calculateResult(109.99);
+        double expected = 2045;
+
+        assertEquals(expected,actual);
+    }
+      @Test
     public void testLowBoundryDecaHighJump(){
         DecaHighJump input = new DecaHighJump();
 
