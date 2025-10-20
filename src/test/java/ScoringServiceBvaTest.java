@@ -1,3 +1,4 @@
+import com.example.decathlon.deca.Deca100M;
 import com.example.decathlon.deca.Deca1500M;
 import com.example.decathlon.heptathlon.Hep100MHurdles;
 import com.example.decathlon.heptathlon.Hep200M;
@@ -229,5 +230,71 @@ public class  ScoringServiceBvaTest {
         double expected = 2045;
 
         assertEquals(expected,actual);
+    }
+    @Test
+    public void testLowBoundary100M() {
+        Deca100M input = new Deca100M();
+
+        double performance = 5.0; // extremely fast
+        double expected = 2640;   // calculated from formula
+
+        double actual = input.calculateResult(performance);
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundary100M() {
+        Deca100M input = new Deca100M();
+
+        double performance = 5.01;
+        double expected = 2636;   // calculated from formula
+
+        double actual = input.calculateResult(performance);
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void Validupperrange100M() { //
+        Deca100M input = new Deca100M();
+
+        double performance = 17.8; // just on upper range
+        double expected = 1; // minimum score
+
+        double actual = input.calculateResult(performance);
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void aboveValidupperrange100M() {
+        Deca100M input = new Deca100M();
+
+        double performance = 17.9;
+        double expected = 0;
+
+        double actual = input.calculateResult(performance);
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testUpperBound100M() {
+        Deca100M input = new Deca100M();
+
+        double performance = 20;
+        double expected = 0;
+
+        double actual = input.calculateResult(performance);
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testbelowUpperBoundary100M() {
+        Deca100M input = new Deca100M();
+
+        double performance = 19.09;
+        double expected = 0;
+
+        double actual = input.calculateResult(performance);
+
+        assertEquals(expected, actual);
     }
 }
