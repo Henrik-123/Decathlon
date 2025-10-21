@@ -1,6 +1,7 @@
 import com.example.decathlon.deca.Deca110MHurdles;
 import com.example.decathlon.deca.Deca1500M;
 import com.example.decathlon.heptathlon.*;
+import com.example.decathlon.heptathlon.HeptShotPut;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -319,6 +320,52 @@ public class  ScoringServiceBvaTest {
 
         double actual = input.calculateResult(29.99);
         double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+  // Shot put (heptathlon)
+    @Test
+    public void  calculationShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(15);
+        double expected = 861;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testLowBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(0);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testAboveLowBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(0.01);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testHighBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(30);
+        double expected = 1887;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testBellowHighBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(29.99);
+        double expected = 1887;
 
         assertEquals(expected, actual);
     }
