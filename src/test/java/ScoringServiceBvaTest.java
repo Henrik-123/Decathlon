@@ -1,14 +1,11 @@
 import com.example.decathlon.deca.Deca1500M;
-import com.example.decathlon.heptathlon.Hep100MHurdles;
-import com.example.decathlon.heptathlon.Hep200M;
-import com.example.decathlon.heptathlon.HeptJavelinThrow;
-import com.example.decathlon.heptathlon.HeptLongJump;
+import com.example.decathlon.heptathlon.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class  ScoringServiceBvaTest {
-
+    // 1500m
     @Test
     public void testLowBoundary1500M(){
         Deca1500M input = new Deca1500M();
@@ -54,6 +51,7 @@ public class  ScoringServiceBvaTest {
 
         assertEquals(expected,actual);
     }
+    // 100m hurdles
     @Test
     public void testLowBoundry100mHurdles(){
         Hep100MHurdles input = new Hep100MHurdles();
@@ -99,6 +97,7 @@ public class  ScoringServiceBvaTest {
 
         assertEquals(expected, actual);
     }
+    // 200m
     @Test
     public void testLowBoundary200m(){
         Hep200M input = new Hep200M();
@@ -229,5 +228,51 @@ public class  ScoringServiceBvaTest {
         double expected = 2045;
 
         assertEquals(expected,actual);
+    }
+    // 800m (heptathlon)
+    @Test
+    public void calculation800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(100);
+        double expected = 1450;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(70);
+        double expected = 2026;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(70.01);
+        double expected = 2026;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(250);
+        double expected = 1;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(249.99);
+        double expected = 1;
+
+        assertEquals(expected, actual);
     }
 }
