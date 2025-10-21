@@ -1,9 +1,7 @@
+import com.example.decathlon.deca.Deca110MHurdles;
 import com.example.decathlon.deca.Deca1500M;
-import com.example.decathlon.heptathlon.Hep100MHurdles;
-import com.example.decathlon.heptathlon.Hep200M;
+import com.example.decathlon.heptathlon.*;
 import com.example.decathlon.heptathlon.HeptShotPut;
-import com.example.decathlon.heptathlon.HeptJavelinThrow;
-import com.example.decathlon.heptathlon.HeptLongJump;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,7 +53,7 @@ public class  ScoringServiceBvaTest {
 
         assertEquals(expected,actual);
     }
-    // 100m
+    // 100m hurdles
     @Test
     public void testLowBoundry100mHurdles(){
         Hep100MHurdles input = new Hep100MHurdles();
@@ -140,52 +138,6 @@ public class  ScoringServiceBvaTest {
         double expected = 0;
 
         assertEquals(expected,actual);
-    }
-    // Shot put (heptathlon)
-    @Test
-    public void  calculationShotPut(){
-        HeptShotPut input = new HeptShotPut();
-
-        double actual = input.calculateResult(15);
-        double expected = 861;
-
-        assertEquals(expected, actual);
-    }
-    @Test
-    public void  testLowBoundryShotPut(){
-        HeptShotPut input = new HeptShotPut();
-
-        double actual = input.calculateResult(0);
-        double expected = 0;
-
-        assertEquals(expected, actual);
-    }
-    @Test
-    public void  testAboveLowBoundryShotPut(){
-        HeptShotPut input = new HeptShotPut();
-
-        double actual = input.calculateResult(0.01);
-        double expected = 0;
-
-        assertEquals(expected, actual);
-    }
-    @Test
-    public void  testHighBoundryShotPut(){
-        HeptShotPut input = new HeptShotPut();
-
-        double actual = input.calculateResult(30);
-        double expected = 1887;
-
-        assertEquals(expected, actual);
-    }
-    @Test
-    public void  testBellowHighBoundryShotPut(){
-        HeptShotPut input = new HeptShotPut();
-
-        double actual = input.calculateResult(29.99);
-        double expected = 1887;
-
-        assertEquals(expected, actual);
     }
     // Long jump (Heptathlon)
     @Test
@@ -278,5 +230,143 @@ public class  ScoringServiceBvaTest {
         double expected = 2045;
 
         assertEquals(expected,actual);
+    }
+    // 800m (heptathlon)
+    @Test
+    public void calculation800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(100);
+        double expected = 1450;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(70);
+        double expected = 2026;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(70.01);
+        double expected = 2026;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(250);
+        double expected = 1;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundry800m(){
+        Hep800M input = new Hep800M();
+
+        double actual = input.calculateResult(249.99);
+        double expected = 1;
+
+        assertEquals(expected, actual);
+    }
+    // 110m hurdles
+    @Test
+    public void calculation110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(20);
+        double expected = 349;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(10);
+        double expected = 1556;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(10.01);
+        double expected = 1554;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(30);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(29.99);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+  // Shot put (heptathlon)
+    @Test
+    public void  calculationShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(15);
+        double expected = 861;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testLowBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(0);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testAboveLowBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(0.01);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testHighBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(30);
+        double expected = 1887;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void  testBellowHighBoundryShotPut(){
+        HeptShotPut input = new HeptShotPut();
+
+        double actual = input.calculateResult(29.99);
+        double expected = 1887;
+
+        assertEquals(expected, actual);
     }
 }
