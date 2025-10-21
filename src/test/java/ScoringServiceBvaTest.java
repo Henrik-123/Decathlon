@@ -1,3 +1,4 @@
+import com.example.decathlon.deca.Deca110MHurdles;
 import com.example.decathlon.deca.Deca1500M;
 import com.example.decathlon.heptathlon.*;
 import org.junit.jupiter.api.Test;
@@ -272,6 +273,52 @@ public class  ScoringServiceBvaTest {
 
         double actual = input.calculateResult(249.99);
         double expected = 1;
+
+        assertEquals(expected, actual);
+    }
+    // 110m hurdles
+    @Test
+    public void calculation110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(20);
+        double expected = 349;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(10);
+        double expected = 1556;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(10.01);
+        double expected = 1554;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(30);
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundry110mHurdles(){
+        Deca110MHurdles input = new Deca110MHurdles();
+
+        double actual = input.calculateResult(29.99);
+        double expected = 0;
 
         assertEquals(expected, actual);
     }
