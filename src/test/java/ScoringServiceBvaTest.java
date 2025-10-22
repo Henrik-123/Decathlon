@@ -1,5 +1,7 @@
 import com.example.decathlon.deca.Deca1500M;
 import com.example.decathlon.deca.DecaHighJump;
+import com.example.decathlon.deca.DecaLongJump;
+import com.example.decathlon.deca.DecaShotPut;
 import com.example.decathlon.heptathlon.Hep100MHurdles;
 import com.example.decathlon.heptathlon.Hep200M;
 import com.example.decathlon.heptathlon.HeptJavelinThrow;
@@ -273,6 +275,96 @@ public class  ScoringServiceBvaTest {
 
         double actual = input.calculateResult((200));
         double expected = 803;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundryDecaLongJump(){
+        DecaLongJump input = new DecaLongJump();
+
+        double actual = input.calculateResult((0));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundryDecaLongJump(){
+        DecaLongJump input = new DecaLongJump();
+
+        double actual = input.calculateResult((0.01));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundryDecaLongJump(){
+        DecaLongJump input = new DecaLongJump();
+
+        double actual = input.calculateResult((1000));
+        double expected = 1606;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundryDecaLongJump(){
+        DecaLongJump input = new DecaLongJump();
+
+        double actual = input.calculateResult((999.99));
+        double expected = 1606;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testCalculationDecaLongJump(){
+        DecaLongJump input = new DecaLongJump();
+
+        double actual = input.calculateResult((600));
+        double expected = 587;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundryDecaShotPut(){
+        DecaShotPut input = new DecaShotPut();
+
+        double actual = input.calculateResult((0));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundryDecaShotPut(){
+        DecaShotPut input = new DecaShotPut();
+
+        double actual = input.calculateResult((0.01));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundryDecaShotPut(){
+        DecaShotPut input = new DecaShotPut();
+
+        double actual = input.calculateResult((30));
+        double expected = 1731;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundryDecaShotPut(){
+        DecaShotPut input = new DecaShotPut();
+
+        double actual = input.calculateResult((29.99));
+        double expected = 1731;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testCalculationDecaShotPut(){
+        DecaShotPut input = new DecaShotPut();
+
+        double actual = input.calculateResult((20));
+        double expected = 1100;
 
         assertEquals(expected, actual);
     }
