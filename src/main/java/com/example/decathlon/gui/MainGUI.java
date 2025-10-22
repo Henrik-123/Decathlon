@@ -1,131 +1,228 @@
 package com.example.decathlon.gui;
 
-
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-
-
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.decathlon.deca.*;
-
+import com.example.decathlon.heptathlon.*;
+import com.example.decathlon.common.InvalidResultException;
 
 public class MainGUI {
 
+    private enum Mode { DEC, HEP }
+
+    private JFrame frame;
     private JTextField nameField;
     private JTextField resultField;
     private JComboBox<String> disciplineBox;
     private JTextArea outputArea;
+    private JRadioButton decRadio;
+    private JRadioButton hepRadio;
+    private JTable standingsTable;
+    private DefaultTableModel standingsModel;
+    private Mode mode = Mode.DEC;
+    private final Map<String, Map<String, Integer>> scoresByAthlete = new LinkedHashMap<>();
 
     public static void main(String[] args) {
-        new MainGUI().createAndShowGUI();
+        SwingUtilities.invokeLater(() -> new MainGUI().createAndShowGUI());
     }
 
     private void createAndShowGUI() {
-        JFrame frame = new JFrame("Track and Field Calculator");
+        frame = new JFrame("Track and Field Calculator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 400);
+        frame.setSize(900, 700);
+        JPanel root = new JPanel(new BorderLayout(10,10));
+        JPanel top = new JPanel(new GridLayout(0,1,6,6));
+        JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        decRadio = new JRadioButton("Decathlon", true);
+        hepRadio = new JRadioButton("Heptathlon");
+        ButtonGroup g = new ButtonGroup();
+        g.add(decRadio); g.add(hepRadio);
+        modePanel.add(new JLabel("Mode:"));
+        modePanel.add(decRadio);
+        modePanel.add(hepRadio);
+        top.add(modePanel);
 
-        JPanel panel = new JPanel(new GridLayout(6, 1));
-
-        // Input for competitor's name
+        JPanel form = new JPanel(new GridLayout(0,2,6,6));
         nameField = new JTextField(20);
-        panel.add(new JLabel("Enter Competitor's Name:"));
-        panel.add(nameField);
+        form.add(new JLabel("Enter Competitor's Name:"));
+        form.add(nameField);
 
-        // Dropdown for selecting discipline
-        String[] disciplines = {
-                "100m", "400m", "1500m", "110m Hurdles",
-                "Long Jump", "High Jump", "Pole Vault",
-                "Discus Throw", "Javelin Throw", "Shot Put"
-        };
-        disciplineBox = new JComboBox<>(disciplines);
-        panel.add(new JLabel("Select Discipline:"));
-        panel.add(disciplineBox);
+        disciplineBox = new JComboBox<>(getEventsForMode(Mode.DEC).toArray(new String[0]));
+        form.add(new JLabel("Select Discipline:"));
+        form.add(disciplineBox);
 
-        // Input for result
         resultField = new JTextField(10);
-        panel.add(new JLabel("Enter Result:"));
-        panel.add(resultField);
+        form.add(new JLabel("Enter Result:"));
+        form.add(resultField);
 
-        // Button to calculate and display result
-        JButton calculateButton = new JButton("Calculate Score");
-        calculateButton.addActionListener(new CalculateButtonListener());
-        panel.add(calculateButton);
+        JButton calcBtn = new JButton("Calculate Score");
+        top.add(form);
+        JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        btnRow.add(calcBtn);
+        top.add(btnRow);
 
-        // Output area
-        outputArea = new JTextArea(5, 40);
+        outputArea = new JTextArea(6, 40);
         outputArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(outputArea);
-        panel.add(scrollPane);
+        JScrollPane outScroll = new JScrollPane(outputArea);
 
-        frame.add(panel);
+        JPanel center = new JPanel(new BorderLayout(6,6));
+        center.add(outScroll, BorderLayout.CENTER);
+
+        standingsModel = buildStandingsModelFor(mode);
+        standingsTable = new JTable(standingsModel);
+        JScrollPane standingsScroll = new JScrollPane(standingsTable);
+        JPanel bottom = new JPanel(new BorderLayout());
+        bottom.add(new JLabel("Standings"), BorderLayout.NORTH);
+        bottom.add(standingsScroll, BorderLayout.CENTER);
+
+        root.add(top, BorderLayout.NORTH);
+        root.add(center, BorderLayout.CENTER);
+        root.add(bottom, BorderLayout.SOUTH);
+
+        decRadio.addActionListener(e -> switchMode(Mode.DEC));
+        hepRadio.addActionListener(e -> switchMode(Mode.HEP));
+
+        calcBtn.addActionListener(e -> onCalculate());
+
+        frame.setContentPane(root);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
-    private class CalculateButtonListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String name = nameField.getText();
-            String discipline = (String) disciplineBox.getSelectedItem();
-            String resultText = resultField.getText();
+    private void switchMode(Mode newMode) {
+        if (mode == newMode) return;
+        mode = newMode;
+        scoresByAthlete.clear();
+        outputArea.setText("");
+        nameField.setText("");
+        resultField.setText("");
+        disciplineBox.removeAllItems();
+        for (String d : getEventsForMode(mode)) disciplineBox.addItem(d);
+        standingsModel = buildStandingsModelFor(mode);
+        standingsTable.setModel(standingsModel);
+    }
 
-            try {
-                double result = Double.parseDouble(resultText);
+    private List<String> getEventsForMode(Mode m) {
+        if (m == Mode.DEC) {
+            return List.of("100m","400m","1500m","110m Hurdles","Long Jump","High Jump","Pole Vault","Discus Throw","Javelin Throw","Shot Put");
+        } else {
+            return List.of("100m Hurdles","High Jump","Shot Put","200m","Long Jump","Javelin Throw","800m");
+        }
+    }
 
-                int score = 0;
-                switch (discipline) {
-                    case "100m":
-                        Deca100M deca100M = new Deca100M();
-                        score = deca100M.calculateResult(result);
-                        break;
-                    case "400m":
-                        Deca400M deca400M = new Deca400M();
-                        score = deca400M.calculateResult(result);
-                        break;
-                    case "1500m":
-                        Deca1500M deca1500M = new Deca1500M();
-                        score = deca1500M.calculateResult(result);
-                        break;
-                    case "110m Hurdles":
-                        Deca110MHurdles deca110MHurdles = new Deca110MHurdles();
-                        score = deca110MHurdles.calculateResult(result);
-                        break;
-                    case "Long Jump":
-                        DecaLongJump decaLongJump = new DecaLongJump();
-                        score = decaLongJump.calculateResult(result);
-                        break;
-                    case "High Jump":
-                        DecaHighJump decaHighJump = new DecaHighJump();
-                        score = decaHighJump.calculateResult(result);
-                        break;
-                    case "Pole Vault":
-                        DecaPoleVault decaPoleVault = new DecaPoleVault();
-                        score = decaPoleVault.calculateResult(result);
-                        break;
-                    case "Discus Throw":
-                        DecaDiscusThrow decaDiscusThrow = new DecaDiscusThrow();
-                        score = decaDiscusThrow.calculateResult(result);
-                        break;
-                    case "Javelin Throw":
-                        DecaJavelinThrow decaJavelinThrow = new DecaJavelinThrow();
-                        score = decaJavelinThrow.calculateResult(result);
-                        break;
-                    case "Shot Put":
-                        DecaShotPut decaShotPut = new DecaShotPut();
-                        score = decaShotPut.calculateResult(result);
-                        break;
-                }
+    private DefaultTableModel buildStandingsModelFor(Mode m) {
+        List<String> cols = new ArrayList<>();
+        cols.add("Rank");
+        cols.add("Name");
+        cols.addAll(getEventsForMode(m));
+        cols.add("Total");
+        return new DefaultTableModel(cols.toArray(new String[0]), 0) {
+            public boolean isCellEditable(int r, int c) { return false; }
+        };
+    }
 
-                outputArea.append("Competitor: " + name + "\n");
-                outputArea.append("Discipline: " + discipline + "\n");
-                outputArea.append("Result: " + result + "\n");
-                outputArea.append("Score: " + score + "\n\n");
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid number for the result.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+    private void onCalculate() {
+        String name = nameField.getText() == null ? "" : nameField.getText().trim();
+        String discipline = (String) disciplineBox.getSelectedItem();
+        String text = resultField.getText() == null ? "" : resultField.getText().trim();
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Please enter a competitor name.", "Missing Name", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        double value;
+        try {
+            value = Double.parseDouble(text.replace(',', '.'));
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(frame, "Please enter a valid number for the result.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            int score = calculateScore(mode, discipline, value);
+            scoresByAthlete.computeIfAbsent(name, k -> new HashMap<>()).put(discipline, score);
+            outputArea.append("Competitor: " + name + "\n");
+            outputArea.append("Discipline: " + discipline + "\n");
+            outputArea.append("Result: " + value + "\n");
+            outputArea.append("Score: " + score + "\n\n");
+            nameField.setText("");
+            resultField.setText("");
+            refreshStandings();
+        } catch (InvalidResultException ire) {
+            JOptionPane.showMessageDialog(frame, ire.getMessage(), "Invalid Result", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame, "Unexpected error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private int calculateScore(Mode m, String discipline, double val) throws InvalidResultException {
+        if (m == Mode.DEC) {
+            switch (discipline) {
+                case "100m": return new Deca100M().calculateResult(val);
+                case "400m": return new Deca400M().calculateResult(val);
+                case "1500m": return new Deca1500M().calculateResult(val);
+                case "110m Hurdles": return new Deca110MHurdles().calculateResult(val);
+                case "Long Jump": return new DecaLongJump().calculateResult(val);
+                case "High Jump": return new DecaHighJump().calculateResult(val);
+                case "Pole Vault": return new DecaPoleVault().calculateResult(val);
+                case "Discus Throw": return new DecaDiscusThrow().calculateResult(val);
+                case "Javelin Throw": return new DecaJavelinThrow().calculateResult(val);
+                case "Shot Put": return new DecaShotPut().calculateResult(val);
+                default: throw new IllegalArgumentException("Unknown discipline");
+            }
+        } else {
+            switch (discipline) {
+                case "100m Hurdles": return new Hep100MHurdles().calculateResult(val);
+                case "High Jump": return new HeptHightJump().calculateResult(val);
+                case "Shot Put": return new HeptShotPut().calculateResult(val);
+                case "200m": return new Hep200M().calculateResult(val);
+                case "Long Jump": return new HeptLongJump().calculateResult(val);
+                case "Javelin Throw": return new HeptJavelinThrow().calculateResult(val);
+                case "800m": return new Hep800M().calculateResult(val);
+                default: throw new IllegalArgumentException("Unknown discipline");
             }
         }
+    }
+
+    private void refreshStandings() {
+        List<String> events = getEventsForMode(mode);
+        List<Row> rows = new ArrayList<>();
+        for (Map.Entry<String, Map<String,Integer>> e : scoresByAthlete.entrySet()) {
+            String name = e.getKey();
+            Map<String,Integer> ev = e.getValue();
+            int total = ev.entrySet().stream().filter(x -> events.contains(x.getKey())).mapToInt(Map.Entry::getValue).sum();
+            Map<String,Integer> filtered = new HashMap<>();
+            for (String d: events) filtered.put(d, ev.getOrDefault(d, null));
+            rows.add(new Row(name, filtered, total));
+        }
+        rows.sort((a,b) -> Integer.compare(b.total, a.total));
+        standingsModel.setRowCount(0);
+        int rank = 0;
+        int index = 0;
+        Integer prevTotal = null;
+        for (Row r : rows) {
+            index++;
+            if (prevTotal == null || r.total != prevTotal) {
+                rank = index;
+                prevTotal = r.total;
+            }
+            List<Object> row = new ArrayList<>();
+            row.add(rank);
+            row.add(r.name);
+            for (String d : events) row.add(r.eventScores.get(d) == null ? "" : r.eventScores.get(d));
+            row.add(r.total);
+            standingsModel.addRow(row.toArray());
+        }
+    }
+
+    private static class Row {
+        final String name;
+        final Map<String,Integer> eventScores;
+        final int total;
+        Row(String n, Map<String,Integer> e, int t) { name = n; eventScores = e; total = t; }
     }
 }
