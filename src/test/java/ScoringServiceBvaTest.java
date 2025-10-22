@@ -1,7 +1,4 @@
-import com.example.decathlon.deca.Deca1500M;
-import com.example.decathlon.deca.DecaHighJump;
-import com.example.decathlon.deca.DecaLongJump;
-import com.example.decathlon.deca.DecaShotPut;
+import com.example.decathlon.deca.*;
 import com.example.decathlon.heptathlon.Hep100MHurdles;
 import com.example.decathlon.heptathlon.Hep200M;
 import com.example.decathlon.heptathlon.HeptJavelinThrow;
@@ -365,6 +362,51 @@ public class  ScoringServiceBvaTest {
 
         double actual = input.calculateResult((20));
         double expected = 1100;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testLowBoundryDecaDiscusThrow(){
+        DecaDiscusThrow input = new DecaDiscusThrow();
+
+        double actual = input.calculateResult((0));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testAboveLowBoundryDecaDiscusThrow(){
+        DecaDiscusThrow input = new DecaDiscusThrow();
+
+        double actual = input.calculateResult((0.01));
+        double expected = 0;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testHighBoundryDecaDiscusThrow(){
+        DecaDiscusThrow input = new DecaDiscusThrow();
+
+        double actual = input.calculateResult((85));
+        double expected = 1622;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testBellowHighBoundryDecaDiscusThrow(){
+        DecaDiscusThrow input = new DecaDiscusThrow();
+
+        double actual = input.calculateResult((84.99));
+        double expected = 1622;
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    public void testCalculationDecaDiscusThrow(){
+        DecaDiscusThrow input = new DecaDiscusThrow();
+
+        double actual = input.calculateResult((60));
+        double expected = 1081;
 
         assertEquals(expected, actual);
     }
