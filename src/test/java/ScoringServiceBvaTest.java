@@ -1,3 +1,4 @@
+import com.example.decathlon.common.CalcTrackAndField;
 import com.example.decathlon.common.InvalidResultException;
 import com.example.decathlon.deca.Deca110MHurdles;
 import com.example.decathlon.deca.Deca1500M;

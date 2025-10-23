@@ -2,6 +2,7 @@ package com.example.decathlon.heptathlon;
 
 import com.example.decathlon.common.CalcTrackAndField;
 import com.example.decathlon.common.InputResult;
+import com.example.decathlon.common.InvalidResultException;
 
 public class Hep100MHurdles {
 
@@ -9,33 +10,21 @@ public class Hep100MHurdles {
 	private double A = 9.23076;
 	private double B = 26.7;
 	private double C = 1.835;
-	boolean active = true;
 	CalcTrackAndField calc = new CalcTrackAndField();
 	InputResult inputResult = new InputResult();
 
 	// Calculate the score based on time. All running events.
-	public int calculateResult(double runningTime) {
+	public int calculateResult(double runningTime) throws InvalidResultException {
 
-		while (active) {
-
-			try {
 				// Acceptable values.
 				if (runningTime < 10) {
-					System.out.println("Value too low");
-					runningTime = inputResult.enterResult();
+                    throw new InvalidResultException("Value too low");
 				} else if (runningTime > 30) {
-					System.out.println("Value too high");
-					runningTime = inputResult.enterResult();
+                    throw new InvalidResultException("Value too high");
 				} else {
-
 					score = calc.calculateTrack(A, B, C, runningTime);
-					active = false;
 				}
-			} catch (Exception e) {
 
-				System.out.println("Please enter numbers");
-			}
-		}
 		System.out.println("The result is " + score);
 		return score;
 	}
