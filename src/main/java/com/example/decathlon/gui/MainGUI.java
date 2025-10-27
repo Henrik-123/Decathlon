@@ -3,14 +3,14 @@ package com.example.decathlon.gui;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.example.decathlon.deca.*;
 import com.example.decathlon.heptathlon.*;
 import com.example.decathlon.common.InvalidResultException;
+import com.example.decathlon.excel.ExcelPrinter;
 
 public class MainGUI {
 
@@ -26,7 +26,17 @@ public class MainGUI {
     private JTable standingsTable;
     private DefaultTableModel standingsModel;
     private Mode mode = Mode.DEC;
-    private final Map<String, Map<String, Integer>> scoresByAthlete = new LinkedHashMap<>();
+
+    private final Map<Mode, LinkedHashMap<String, Map<String, Integer>>> scoresStore = new EnumMap<>(Mode.class);
+
+    public MainGUI() {
+        scoresStore.put(Mode.DEC, new LinkedHashMap<>());
+        scoresStore.put(Mode.HEP, new LinkedHashMap<>());
+    }
+
+    private Map<String, Map<String, Integer>> scoresFor(Mode m) {
+        return scoresStore.get(m);
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainGUI().createAndShowGUI());
@@ -38,6 +48,7 @@ public class MainGUI {
         frame.setSize(900, 700);
         JPanel root = new JPanel(new BorderLayout(10,10));
         JPanel top = new JPanel(new GridLayout(0,1,6,6));
+
         JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         decRadio = new JRadioButton("Decathlon", true);
         hepRadio = new JRadioButton("Heptathlon");
@@ -62,9 +73,12 @@ public class MainGUI {
         form.add(resultField);
 
         JButton calcBtn = new JButton("Calculate Score");
+        JButton exportBtn = new JButton("Export to Excel");
+
         top.add(form);
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnRow.add(calcBtn);
+        btnRow.add(exportBtn);
         top.add(btnRow);
 
         outputArea = new JTextArea(6, 40);
@@ -89,6 +103,7 @@ public class MainGUI {
         hepRadio.addActionListener(e -> switchMode(Mode.HEP));
 
         calcBtn.addActionListener(e -> onCalculate());
+        exportBtn.addActionListener(e -> onExport());
 
         frame.setContentPane(root);
         frame.setLocationRelativeTo(null);
@@ -98,7 +113,6 @@ public class MainGUI {
     private void switchMode(Mode newMode) {
         if (mode == newMode) return;
         mode = newMode;
-        scoresByAthlete.clear();
         outputArea.setText("");
         nameField.setText("");
         resultField.setText("");
@@ -106,6 +120,7 @@ public class MainGUI {
         for (String d : getEventsForMode(mode)) disciplineBox.addItem(d);
         standingsModel = buildStandingsModelFor(mode);
         standingsTable.setModel(standingsModel);
+        refreshStandings();
     }
 
     private List<String> getEventsForMode(Mode m) {
@@ -129,12 +144,12 @@ public class MainGUI {
 
     private void onCalculate() {
         String name = nameField.getText() == null ? "" : nameField.getText().trim();
-        String discipline = (String) disciplineBox.getSelectedItem();
-        String text = resultField.getText() == null ? "" : resultField.getText().trim();
-        if (name.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Please enter a competitor name.", "Missing Name", JOptionPane.ERROR_MESSAGE);
+        if (name.isEmpty() || !name.matches(".*[a-zA-ZåäöÅÄÖ].*") || name.matches("^[\\d\\s\\p{Punct}]+$")) {
+            JOptionPane.showMessageDialog(frame, "Please enter a valid competitor name.", "Invalid Name", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        String discipline = (String) disciplineBox.getSelectedItem();
+        String text = resultField.getText() == null ? "" : resultField.getText().trim();
         double value;
         try {
             value = Double.parseDouble(text.replace(',', '.'));
@@ -144,7 +159,7 @@ public class MainGUI {
         }
         try {
             int score = calculateScore(mode, discipline, value);
-            scoresByAthlete.computeIfAbsent(name, k -> new HashMap<>()).put(discipline, score);
+            scoresFor(mode).computeIfAbsent(name, k -> new HashMap<>()).put(discipline, score);
             outputArea.append("Competitor: " + name + "\n");
             outputArea.append("Discipline: " + discipline + "\n");
             outputArea.append("Result: " + value + "\n");
@@ -156,6 +171,36 @@ public class MainGUI {
             JOptionPane.showMessageDialog(frame, ire.getMessage(), "Invalid Result", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(frame, "Unexpected error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void onExport() {
+        try {
+            ExcelPrinter printer = new ExcelPrinter(mode == Mode.DEC ? "Decathlon" : "Heptathlon");
+
+            List<String> cols = new ArrayList<>();
+            cols.add("Rank");
+            cols.add("Name");
+            cols.addAll(getEventsForMode(mode));
+            cols.add("Total");
+
+            int rows = standingsModel.getRowCount();
+            int colsCount = standingsModel.getColumnCount();
+
+            Object[][] data = new Object[rows + 1][colsCount];
+            for (int c = 0; c < colsCount; c++) data[0][c] = standingsModel.getColumnName(c);
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < colsCount; c++) {
+                    data[r + 1][c] = standingsModel.getValueAt(r, c);
+                }
+            }
+
+            printer.add(data, mode == Mode.DEC ? "Decathlon" : "Heptathlon");
+            printer.write();
+            JOptionPane.showMessageDialog(frame, "Excel file saved successfully!", "Export Complete", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame, "Error while writing Excel file: " + e.getMessage(), "Export Failed", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -191,7 +236,7 @@ public class MainGUI {
     private void refreshStandings() {
         List<String> events = getEventsForMode(mode);
         List<Row> rows = new ArrayList<>();
-        for (Map.Entry<String, Map<String,Integer>> e : scoresByAthlete.entrySet()) {
+        for (Map.Entry<String, Map<String,Integer>> e : scoresFor(mode).entrySet()) {
             String name = e.getKey();
             Map<String,Integer> ev = e.getValue();
             int total = ev.entrySet().stream().filter(x -> events.contains(x.getKey())).mapToInt(Map.Entry::getValue).sum();
