@@ -554,4 +554,64 @@ public class  ScoringServiceBvaTest {
 
         assertEquals(expected, actual);
     }
+  
+  // HighJump (Heptathlon)
+    @Test
+
+    public void testExactUpperBoundaryLimitHeptaHighJump() {
+        HeptHightJump input = new HeptHightJump();
+
+        double actual = input.calculateResult((300.00));
+        double expected = 2733;
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+
+    public void testAboveUpperBoundaryLimitHeptaHighJump() {
+        HeptHightJump input = new HeptHightJump();
+
+        double actual = input.calculateResult((300.01));
+        double expected = 0; // Should show error message, value too high
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+
+    public void testBelowUpperBoundaryLimitHeptaHighJump() {
+        HeptHightJump input = new HeptHightJump();
+
+        double actual = input.calculateResult((299.99));
+        double expected = 2733;
+
+        assertEquals(actual, expected);
+
+    }
+
+    @Test
+
+    public void testExactLowerBoundaryLimitHeptaHighJump() {
+        HeptHightJump input = new HeptHightJump();
+
+        double actual = input.calculateResult((0));
+        double expected = 0;
+
+        assertEquals(actual, expected);
+
+    }
+
+    @Test
+
+    public void testAboveLowerBoundaryLimitHeptaHighJump() {
+        HeptHightJump input = new HeptHightJump();
+
+        double actual = input.calculateResult((0.01));
+        double expected = 0;
+
+        assertEquals(actual, expected);
+
+    }
+  
 }
