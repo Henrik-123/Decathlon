@@ -2,6 +2,7 @@ package com.example.decathlon.heptathlon;
 
 import com.example.decathlon.common.CalcTrackAndField;
 import com.example.decathlon.common.InputResult;
+import com.example.decathlon.common.InvalidResultException;
 
 public class Hep800M {
 
@@ -14,28 +15,17 @@ public class Hep800M {
 	InputResult inputResult = new InputResult();
 
 	// Calculate the score based on time. All running events.
-	public int calculateResult(double runningTime) {
+	public int calculateResult(double runningTime) throws InvalidResultException {
 
-		while (active) {
+        // Acceptable values.
+        if (runningTime < 70) {
+            throw new InvalidResultException("Value too low");
+        } else if (runningTime > 250) {
+            throw new InvalidResultException("Value too high");
+        } else {
+            score = calc.calculateTrack(A, B, C, runningTime);
+        }
 
-			try {
-				// Acceptable values.
-				if (runningTime < 70) {
-					System.out.println("Value too low");
-					runningTime = inputResult.enterResult();
-				} else if (runningTime > 250) {
-					// competitor gets 1 point in 250.79 sec
-					System.out.println("Value too high");
-					runningTime = inputResult.enterResult();
-				} else {
-					score = calc.calculateTrack(A, B, C, runningTime);
-					active = false;
-				}
-			} catch (Exception e) {
-
-				System.out.println("Please enter numbers");
-			}
-		}
 		System.out.println("The result is " + score);
 		return score;
 	}
