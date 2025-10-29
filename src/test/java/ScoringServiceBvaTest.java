@@ -6,6 +6,8 @@ import com.example.decathlon.heptathlon.*;
 import com.example.decathlon.heptathlon.HeptShotPut;
 import org.junit.jupiter.api.Test;
 
+import java.util.InputMismatchException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class  ScoringServiceBvaTest {
